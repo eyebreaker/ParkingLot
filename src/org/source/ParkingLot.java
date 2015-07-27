@@ -1,6 +1,8 @@
 package org.source;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,10 +19,28 @@ public class ParkingLot {
         this.ParkingLotSize = ParkingLotSize;
     }
 
+    public boolean checkCarUnique(Car car){
+
+        boolean retVal = true;
+        Iterator it = parkingSpace.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            if(pair.getValue().equals(car)){
+                retVal = false;
+                break;
+            }
+        }
+
+        return retVal;
+    }
+
     public int park(Car car){
 
         if(currentNumCars > ParkingLotSize) {
             throw new ParkingLotFullException("There is no Space in the Parking Lot");
+        }
+        if(!checkCarUnique(car)){
+            throw new CarParkedAgainException("The Car Already Exists");
         }
         parkingSpace.put(currentNumCars++,car);
         return currentNumCars-1;

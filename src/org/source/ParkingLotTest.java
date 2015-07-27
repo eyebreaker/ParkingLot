@@ -32,4 +32,14 @@ public class ParkingLotTest {
         assertEquals(2,p1.park(c2));
         assertEquals(3,p1.park(c3));
     }
+
+    @Test(expected = CarParkedAgainException.class)
+    public void testParkingCarAgain() throws  Exception{
+        Car c1 = new Car(1,"Maruti");
+        Car c2 = new Car(1,"Maruti");
+
+        ParkingLot p1 = new ParkingLot(2);
+        assertEquals(1,p1.park(c1));
+        assertEquals(2,p1.park(c2));
+    }
 }
