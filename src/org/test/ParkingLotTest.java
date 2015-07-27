@@ -1,6 +1,7 @@
-package org.source;
+package org.test;
 
 import org.junit.Test;
+import org.source.*;
 
 import static org.junit.Assert.*;
 
@@ -61,5 +62,31 @@ public class ParkingLotTest {
         ParkingLot p1 = new ParkingLot(2);
         Car c2 = p1.retriveCar(1);
     }
+
+    @Test
+    public void testOnFullNotification() throws Exception{
+        Car c1 = new Car(1,"Maruti");
+        Car c2 = new Car(2,"Audi");
+        ParkingLotOwnerTest owner = new ParkingLotOwnerTest();
+        ParkingLot p1 = new ParkingLot(2,owner);
+        p1.park(c1);
+        p1.park(c2);
+        assertTrue(owner.getIsFull());
+
+    }
+
+    @Test
+    public void testOnBecomingNotFullNotification() throws Exception{
+        Car c1 = new Car(1,"Maruti");
+        Car c2 = new Car(2,"Audi");
+        ParkingLotOwnerTest owner = new ParkingLotOwnerTest();
+        ParkingLot p1 = new ParkingLot(2,owner);
+        int token = p1.park(c1);
+        p1.park(c2);
+        p1.retriveCar(token);
+        assertFalse(owner.getIsFull());
+    }
+
+
 
 }
