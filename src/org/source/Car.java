@@ -5,5 +5,13 @@ package org.source;
  */
 public class Car {
 
+    private int id;
+    private String carName;
+
+    public Car(int id, String carName){
+        this.id = id;
+        this.carName = carName;
+    }
+
 
 }
