@@ -42,4 +42,24 @@ public class ParkingLotTest {
         assertEquals(1,p1.park(c1));
         assertEquals(2,p1.park(c2));
     }
+
+
+    @Test
+    public void testRetrieveCarWhenCarExists() throws Exception{
+
+        Car c1 = new Car(1,"Maruti");
+        ParkingLot p1 = new ParkingLot(2);
+        int token = p1.park(c1);
+        Car c2 = p1.retriveCar(token);
+        assertTrue(c2.equals(c1));
+
+    }
+
+    @Test(expected = CarNotExistException.class)
+    public void testRetrieveCarWhenCarNotExists()throws Exception{
+
+        ParkingLot p1 = new ParkingLot(2);
+        Car c2 = p1.retriveCar(1);
+    }
+
 }

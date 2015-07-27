@@ -13,10 +13,11 @@ public class ParkingLot {
     private int currentNumCars = 1;
     private int ParkingLotSize = 2;
     /*private boolean ParkingSpace[][] = new boolean[breadth][height];*/
-    private Map<Integer,Car> parkingSpace = new HashMap<Integer,Car>();
+    private Map<Integer,Car> parkingSpace ;
 
     public ParkingLot(int ParkingLotSize){
         this.ParkingLotSize = ParkingLotSize;
+        parkingSpace = new HashMap<Integer,Car>();
     }
 
     public boolean checkCarUnique(Car car){
@@ -44,5 +45,16 @@ public class ParkingLot {
         }
         parkingSpace.put(currentNumCars++,car);
         return currentNumCars-1;
+    }
+
+    public Car retriveCar(int token) {
+        Iterator it = parkingSpace.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            if (pair.getKey() == token) {
+                return (Car) pair.getValue();
+            }
+        }
+        throw new CarNotExistException("There is no Car against this Token Number");
     }
 }

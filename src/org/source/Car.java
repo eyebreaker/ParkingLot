@@ -16,8 +16,20 @@ public class Car {
     }
 
     @Override
-    public boolean equals(Object c) {
-        Car car = (Car) c;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Car)) return false;
+
+        Car car = (Car) o;
+
         return carName.equals(car.carName);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + carName.hashCode();
+        return result;
     }
 }
