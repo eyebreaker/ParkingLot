@@ -3,6 +3,9 @@ package org.test;
 import org.junit.Test;
 import org.source.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -76,7 +79,7 @@ public class ParkingLotTest {
     }
 
     @Test
-    public void testOnBecomingNotFullNotification() throws Exception{
+    public void testOnBecomingAvailableNotification() throws Exception{
         Car c1 = new Car(1,"Maruti");
         Car c2 = new Car(2,"Audi");
         ParkingLotOwnerTest owner = new ParkingLotOwnerTest();
@@ -88,5 +91,51 @@ public class ParkingLotTest {
     }
 
 
+    @Test
+    public void testOnFullNotificationForObservers() throws Exception{
+
+        Car c1 = new Car(1,"Maruti");
+        Car c2 = new Car(2,"Audi");
+        List<ParkingLotObserverTest> observers = new ArrayList<ParkingLotObserverTest>();
+        ParkingLotOwnerTest owner = new ParkingLotOwnerTest();
+        ParkingLot p1 = new ParkingLot(2,owner);
+        observers.add(owner);
+        FbiAgentTest agent1 = new FbiAgentTest();
+        FbiAgentTest agent2 = new FbiAgentTest();
+        observers.add(agent1);
+        observers.add(agent2);
+
+        p1.registerObserver(agent1);
+        p1.registerObserver(agent2);
+        p1.park(c1);
+        p1.park(c2);
+        for(ParkingLotObserverTest observer : observers) {
+            assertTrue(observer.getIsFull());
+        }
+    }
+
+    @Test
+    public void testOnAvailabilityNotificationForObservers() throws Exception{
+
+        Car c1 = new Car(1,"Maruti");
+        Car c2 = new Car(2,"Audi");
+        List<ParkingLotObserverTest> observers = new ArrayList<ParkingLotObserverTest>();
+        ParkingLotOwnerTest owner = new ParkingLotOwnerTest();
+        ParkingLot p1 = new ParkingLot(2,owner);
+        observers.add(owner);
+        FbiAgentTest agent1 = new FbiAgentTest();
+        FbiAgentTest agent2 = new FbiAgentTest();
+        observers.add(agent1);
+        observers.add(agent2);
+
+        p1.registerObserver(agent1);
+        p1.registerObserver(agent2);
+        int token = p1.park(c1);
+        p1.park(c2);
+        p1.retriveCar(token);
+        for(ParkingLotObserverTest observer : observers) {
+            assertFalse(observer.getIsFull());
+        }
+    }
 
 }

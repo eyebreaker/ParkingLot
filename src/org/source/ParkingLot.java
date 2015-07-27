@@ -1,8 +1,6 @@
 package org.source;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Bhushan on 27-Jul-15.
@@ -13,19 +11,31 @@ public class ParkingLot {
     private int parkingLotSize = 2;
     private boolean isFull = false;
     private ParkingLotOwner owner;
+    private List<ParkingLotObserver> observers ;
     private Map<Integer,Car> parkingSpace ;
 
 
     public ParkingLot(int ParkingLotSize){
         this.parkingLotSize = ParkingLotSize;
         parkingSpace = new HashMap<Integer,Car>();
-        owner = new ParkingLotOwner();
+        owner = new Owner();
+        observers = new ArrayList<ParkingLotObserver>();
     }
 
     public ParkingLot(int ParkingLotSize,ParkingLotOwner owner){
         this.parkingLotSize = ParkingLotSize;
         this.owner = owner;
         parkingSpace = new HashMap<Integer,Car>();
+        observers = new ArrayList<ParkingLotObserver>();
+        registerObserver(owner);
+    }
+
+    public boolean registerObserver(ParkingLotObserver observer){
+        return observers.add(observer);
+    }
+
+    public boolean removeObserver(ParkingLotObserver observer){
+        return observers.remove(observer);
     }
 
     public boolean checkCarUnique(Car car){
@@ -60,7 +70,9 @@ public class ParkingLot {
         if(currentNumCars > parkingLotSize) {
             if(isFull != true) {
                 isFull = true;
-                owner.onFull();
+                for (ParkingLotObserver observer : observers){
+                    observer.onFull();
+                }
             }
         }
     }
@@ -69,7 +81,9 @@ public class ParkingLot {
     public void checkNotFull(){
         if(isFull == true) {
             isFull = false;
-            owner.onBecomingNotFull();
+            for(ParkingLotObserver observer : observers){
+                observer.onAvailability();
+            }
         }
     }
 
