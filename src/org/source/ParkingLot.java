@@ -1,5 +1,10 @@
 package org.source;
 
+import org.Events.ParkingLotEvent;
+import org.Exceptions.CarNotExistException;
+import org.Exceptions.CarParkedAgainException;
+import org.Exceptions.ParkingLotFullException;
+
 import java.util.*;
 
 /**
@@ -71,7 +76,7 @@ public class ParkingLot {
             if(isFull != true) {
                 isFull = true;
                 for (ParkingLotObserver observer : observers){
-                    observer.onFull();
+                    observer.notifyHandler(ParkingLotEvent.FULL);
                 }
             }
         }
@@ -82,7 +87,7 @@ public class ParkingLot {
         if(isFull == true) {
             isFull = false;
             for(ParkingLotObserver observer : observers){
-                observer.onAvailability();
+                observer.notifyHandler(ParkingLotEvent.ONAVAILABLE);
             }
         }
     }
