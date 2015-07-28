@@ -12,35 +12,44 @@ import java.util.*;
  */
 public class ParkingLot {
 
-    private int currentNumCars = 1;
+    private int currentNumCars = 0;
     private int parkingLotSize = 2;
     private boolean isFull = false;
     private ParkingLotOwner owner;
-    private List<ParkingLotObserver> observers ;
+    //private List<ParkingLotObserver> observers ;
+    private Map<ParkingLotObserver,SubscribeStrategy> observers;
     private Map<Integer,Car> parkingSpace ;
+    private ParkingLotEvent event = ParkingLotEvent.INITIAL;
 
 
     public ParkingLot(int ParkingLotSize){
         this.parkingLotSize = ParkingLotSize;
         parkingSpace = new HashMap<Integer,Car>();
         owner = new Owner();
-        observers = new ArrayList<ParkingLotObserver>();
+        observers = new HashMap<ParkingLotObserver,SubscribeStrategy>();
     }
 
     public ParkingLot(int ParkingLotSize,ParkingLotOwner owner){
         this.parkingLotSize = ParkingLotSize;
         this.owner = owner;
         parkingSpace = new HashMap<Integer,Car>();
-        observers = new ArrayList<ParkingLotObserver>();
-        registerObserver(owner);
+        observers = new HashMap<ParkingLotObserver,SubscribeStrategy>();
+        subscribeObserver(owner, new SubscribeStrategy() {
+            @Override
+            public boolean apply(ParkingLotEvent event) {
+                if (event == ParkingLotEvent.FULL || event == ParkingLotEvent.ONAVAILABLE)
+                    return true;
+                return false;
+            }
+        });
     }
 
-    public boolean registerObserver(ParkingLotObserver observer){
-        return observers.add(observer);
+    public void subscribeObserver(ParkingLotObserver observer,SubscribeStrategy strategy){
+        observers.put(observer, strategy);
     }
 
-    public boolean removeObserver(ParkingLotObserver observer){
-        return observers.remove(observer);
+    public void unsubscribeObserver(ParkingLotObserver observer){
+        observers.remove(observer);
     }
 
     public boolean checkCarUnique(Car car){
@@ -66,30 +75,10 @@ public class ParkingLot {
         if(!checkCarUnique(car)){
             throw new CarParkedAgainException("The Car Already Exists");
         }
-        parkingSpace.put(currentNumCars++, car);
-        checkFull();
-        return currentNumCars-1;
-    }
-
-    public void checkFull(){
-        if(currentNumCars > parkingLotSize) {
-            if(isFull != true) {
-                isFull = true;
-                for (ParkingLotObserver observer : observers){
-                    observer.notifyHandler(ParkingLotEvent.FULL);
-                }
-            }
-        }
-    }
-
-
-    public void checkNotFull(){
-        if(isFull == true) {
-            isFull = false;
-            for(ParkingLotObserver observer : observers){
-                observer.notifyHandler(ParkingLotEvent.ONAVAILABLE);
-            }
-        }
+        parkingSpace.put(++currentNumCars, car);
+        if(checkIfEvent())
+            notifyObservers();
+        return currentNumCars;
     }
 
     public Car retriveCar(int token) {
@@ -98,11 +87,37 @@ public class ParkingLot {
             Map.Entry pair = (Map.Entry) it.next();
             if (pair.getKey() == token) {
                 currentNumCars--;
-                checkNotFull();
+                if(checkIfEvent())
+                    notifyObservers();
                 return (Car) pair.getValue();
             }
         }
         throw new CarNotExistException("There is no Car against this Token Number");
+    }
+
+    public void notifyObservers(){
+        for(ParkingLotObserver observer : observers.keySet()){
+            if(observers.get(observer).apply(event)){
+                observer.notifyHandler(event);
+            }
+        }
+    }
+
+    private boolean checkIfEvent() {
+
+        boolean retVal = false;
+        if(currentNumCars == parkingLotSize && event!=ParkingLotEvent.FULL){
+            event = ParkingLotEvent.FULL;
+            retVal = true;
+        }else if(event == ParkingLotEvent.FULL && (currentNumCars == parkingLotSize-1)){
+            event = ParkingLotEvent.ONAVAILABLE;
+            retVal = true;
+        }else if (currentNumCars == (0.8 * parkingLotSize)){
+            event = ParkingLotEvent.EIGHTY;
+            retVal = true;
+        }
+
+        return retVal;
     }
 
 }

@@ -5,7 +5,7 @@ package org.Events;
  */
 public enum ParkingLotEvent {
 
-    FULL, ONAVAILABLE;
+    INITIAL, FULL, ONAVAILABLE, EIGHTY;
 
 
 }

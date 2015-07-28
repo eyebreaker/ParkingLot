@@ -8,30 +8,16 @@ import org.source.ParkingLotObserver;
  */
 public class TestParkingLotObserver implements ParkingLotObserver{
 
-    private boolean isFull = false;
+    private ParkingLotEvent status;
 
-    public boolean getIsFull(){
-        return isFull;
-    }
-    public void onFull() {
-        isFull = true;
-    }
-
-    public void onAvailability() {
-        isFull = false;
+    public ParkingLotEvent getStatus(){
+        return status;
     }
 
     @Override
     public void notifyHandler(ParkingLotEvent event) {
 
-        switch(event){
-            case FULL:
-                onFull();
-                break;
-            case ONAVAILABLE:
-                onAvailability();
-                break;
-        }
+        status = event;
 
     }
 }

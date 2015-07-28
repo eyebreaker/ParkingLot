@@ -1,5 +1,6 @@
 package org.test;
 
+import org.Events.ParkingLotEvent;
 import org.Exceptions.CarNotExistException;
 import org.Exceptions.CarParkedAgainException;
 import org.Exceptions.ParkingLotFullException;
@@ -21,7 +22,6 @@ public class ParkingLotTest {
 
         Car c1 = new Car(1,"Maruti");
         Car c2 = new Car(2,"Audi");
-
         ParkingLot p1 = new ParkingLot(2);
         assertEquals(1,p1.park(c1));
         assertEquals(2,p1.park(c2));
@@ -77,7 +77,7 @@ public class ParkingLotTest {
         ParkingLot p1 = new ParkingLot(2,owner);
         p1.park(c1);
         p1.park(c2);
-        assertTrue(owner.getIsFull());
+        assertTrue(owner.getStatus() == ParkingLotEvent.FULL);
 
     }
 
@@ -90,7 +90,7 @@ public class ParkingLotTest {
         int token = p1.park(c1);
         p1.park(c2);
         p1.retriveCar(token);
-        assertFalse(owner.getIsFull());
+        assertTrue(owner.getStatus() == ParkingLotEvent.ONAVAILABLE);
     }
 
 
@@ -108,12 +108,26 @@ public class ParkingLotTest {
         observers.add(agent1);
         observers.add(agent2);
 
-        p1.registerObserver(agent1);
-        p1.registerObserver(agent2);
+        p1.subscribeObserver(agent1,  new SubscribeStrategy() {
+            @Override
+            public boolean apply(ParkingLotEvent event) {
+                if (event == ParkingLotEvent.FULL || event == ParkingLotEvent.ONAVAILABLE)
+                    return true;
+                return false;
+            }
+        });
+        p1.subscribeObserver(agent2, new SubscribeStrategy() {
+            @Override
+            public boolean apply(ParkingLotEvent event) {
+                if (event == ParkingLotEvent.FULL || event == ParkingLotEvent.ONAVAILABLE)
+                    return true;
+                return false;
+            }
+        });
         p1.park(c1);
         p1.park(c2);
         for(TestParkingLotObserver observer : observers) {
-            assertTrue(observer.getIsFull());
+            assertTrue(observer.getStatus()== ParkingLotEvent.FULL);
         }
     }
 
@@ -131,14 +145,63 @@ public class ParkingLotTest {
         observers.add(agent1);
         observers.add(agent2);
 
-        p1.registerObserver(agent1);
-        p1.registerObserver(agent2);
+        p1.subscribeObserver(agent1, new SubscribeStrategy() {
+            @Override
+            public boolean apply(ParkingLotEvent event) {
+                if (event == ParkingLotEvent.FULL || event == ParkingLotEvent.ONAVAILABLE)
+                    return true;
+                return false;
+            }
+        });
+        p1.subscribeObserver(agent2,new SubscribeStrategy() {
+            @Override
+            public boolean apply(ParkingLotEvent event) {
+                if (event == ParkingLotEvent.FULL || event == ParkingLotEvent.ONAVAILABLE)
+                    return true;
+                return false;
+            }
+        });
         int token = p1.park(c1);
         p1.park(c2);
         p1.retriveCar(token);
         for(TestParkingLotObserver observer : observers) {
-            assertFalse(observer.getIsFull());
+            assertTrue(observer.getStatus() == ParkingLotEvent.ONAVAILABLE);
         }
     }
 
+    @Test
+    public void testOnEightyPercentAvailabilityForFbi() throws Exception{
+        Car c1 = new Car(1,"Maruti");
+        Car c2 = new Car(2,"Audi");
+        Car c3 = new Car(3,"Mercedes");
+        Car c4 = new Car(4,"Porsche");
+        List<TestParkingLotObserver> observers = new ArrayList<TestParkingLotObserver>();
+        TestParkingLotOwner owner = new TestParkingLotOwner();
+        ParkingLot p1 = new ParkingLot(5,owner);
+        TestParkingLotObserver agent1 = new TestParkingLotObserver();
+        TestParkingLotObserver agent2 = new TestParkingLotObserver();
+        observers.add(agent1);
+        observers.add(agent2);
+
+        SubscribeStrategy strategy = new SubscribeStrategy() {
+            @Override
+            public boolean apply(ParkingLotEvent event) {
+                if(event == ParkingLotEvent.EIGHTY){
+                    return true;
+                }
+                return false;
+            }
+        };
+        p1.subscribeObserver(agent1,strategy);
+        p1.subscribeObserver(agent2,strategy);
+        int token = p1.park(c1);
+        p1.park(c2);
+        p1.park(c3);
+        p1.park(c4);
+        p1.retriveCar(token);
+
+        for(TestParkingLotObserver observer : observers) {
+            assertTrue(observer.getStatus() == ParkingLotEvent.EIGHTY);
+        }
+    }
 }
