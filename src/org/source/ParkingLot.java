@@ -12,14 +12,15 @@ import java.util.*;
  */
 public class ParkingLot {
 
+    private String name;
+    private int token = 0;
     private int currentNumCars = 0;
     private int parkingLotSize = 2;
-    private boolean isFull = false;
     private ParkingLotOwner owner;
-    //private List<ParkingLotObserver> observers ;
     private Map<ParkingLotObserver,SubscribeStrategy> observers;
     private Map<Integer,Car> parkingSpace ;
     private ParkingLotEvent event = ParkingLotEvent.INITIAL;
+
 
 
     public ParkingLot(int ParkingLotSize){
@@ -29,9 +30,10 @@ public class ParkingLot {
         observers = new HashMap<ParkingLotObserver,SubscribeStrategy>();
     }
 
-    public ParkingLot(int ParkingLotSize,ParkingLotOwner owner){
+    public ParkingLot(int ParkingLotSize,String name,ParkingLotOwner owner){
         this.parkingLotSize = ParkingLotSize;
         this.owner = owner;
+        this.name = name;
         parkingSpace = new HashMap<Integer,Car>();
         observers = new HashMap<ParkingLotObserver,SubscribeStrategy>();
         subscribeObserver(owner, new SubscribeStrategy() {
@@ -42,6 +44,10 @@ public class ParkingLot {
                 return false;
             }
         });
+    }
+
+    public String getName(){
+        return name;
     }
 
     public void subscribeObserver(ParkingLotObserver observer,SubscribeStrategy strategy){
@@ -75,10 +81,11 @@ public class ParkingLot {
         if(!checkCarUnique(car)){
             throw new CarParkedAgainException("The Car Already Exists");
         }
-        parkingSpace.put(++currentNumCars, car);
+        parkingSpace.put(++token, car);
+        ++currentNumCars;
         if(checkIfEvent())
             notifyObservers();
-        return currentNumCars;
+        return token;
     }
 
     public Car retriveCar(int token) {
@@ -98,7 +105,7 @@ public class ParkingLot {
     public void notifyObservers(){
         for(ParkingLotObserver observer : observers.keySet()){
             if(observers.get(observer).apply(event)){
-                observer.notifyHandler(event);
+                observer.notifyHandler(event,name);
             }
         }
     }

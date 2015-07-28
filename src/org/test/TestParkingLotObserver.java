@@ -14,10 +14,9 @@ public class TestParkingLotObserver implements ParkingLotObserver{
         return status;
     }
 
-    @Override
-    public void notifyHandler(ParkingLotEvent event) {
 
-        status = event;
+    @Override
+    public void notifyHandler(ParkingLotEvent event, String parkingLotName) {
 
     }
 }

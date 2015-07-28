@@ -74,7 +74,7 @@ public class ParkingLotTest {
         Car c1 = new Car(1,"Maruti");
         Car c2 = new Car(2,"Audi");
         TestParkingLotOwner owner = new TestParkingLotOwner();
-        ParkingLot p1 = new ParkingLot(2,owner);
+        ParkingLot p1 = new ParkingLot(2,"A",owner);
         p1.park(c1);
         p1.park(c2);
         assertTrue(owner.getStatus() == ParkingLotEvent.FULL);
@@ -86,7 +86,7 @@ public class ParkingLotTest {
         Car c1 = new Car(1,"Maruti");
         Car c2 = new Car(2,"Audi");
         TestParkingLotOwner owner = new TestParkingLotOwner();
-        ParkingLot p1 = new ParkingLot(2,owner);
+        ParkingLot p1 = new ParkingLot(2,"A",owner);
         int token = p1.park(c1);
         p1.park(c2);
         p1.retriveCar(token);
@@ -101,7 +101,7 @@ public class ParkingLotTest {
         Car c2 = new Car(2,"Audi");
         List<TestParkingLotObserver> observers = new ArrayList<TestParkingLotObserver>();
         TestParkingLotOwner owner = new TestParkingLotOwner();
-        ParkingLot p1 = new ParkingLot(2,owner);
+        ParkingLot p1 = new ParkingLot(2,"A",owner);
         observers.add(owner);
         TestParkingLotObserver agent1 = new TestParkingLotObserver();
         TestParkingLotObserver agent2 = new TestParkingLotObserver();
@@ -138,7 +138,7 @@ public class ParkingLotTest {
         Car c2 = new Car(2,"Audi");
         List<TestParkingLotObserver> observers = new ArrayList<TestParkingLotObserver>();
         TestParkingLotOwner owner = new TestParkingLotOwner();
-        ParkingLot p1 = new ParkingLot(2,owner);
+        ParkingLot p1 = new ParkingLot(2,"A",owner);
         observers.add(owner);
         TestParkingLotObserver agent1 = new TestParkingLotObserver();
         TestParkingLotObserver agent2 = new TestParkingLotObserver();
@@ -177,7 +177,7 @@ public class ParkingLotTest {
         Car c4 = new Car(4,"Porsche");
         List<TestParkingLotObserver> observers = new ArrayList<TestParkingLotObserver>();
         TestParkingLotOwner owner = new TestParkingLotOwner();
-        ParkingLot p1 = new ParkingLot(5,owner);
+        ParkingLot p1 = new ParkingLot(5,"A",owner);
         TestParkingLotObserver agent1 = new TestParkingLotObserver();
         TestParkingLotObserver agent2 = new TestParkingLotObserver();
         observers.add(agent1);

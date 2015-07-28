@@ -7,8 +7,10 @@ import org.Events.ParkingLotEvent;
  */
 public class Owner implements ParkingLotOwner {
 
+
+
     @Override
-    public void notifyHandler(ParkingLotEvent event) {
+    public void notifyHandler(ParkingLotEvent event, String parkingLotName) {
 
     }
 }
