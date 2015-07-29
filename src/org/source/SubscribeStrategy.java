@@ -1,11 +1,11 @@
 package org.source;
 
-import org.Events.ParkingLotEvent;
+import org.Events.ParkingLotNotification;
 
 /**
  * Created by Bhushan on 28-Jul-15.
  */
 public interface SubscribeStrategy {
 
-    public boolean apply(ParkingLotEvent event);
+  boolean apply(ParkingLotNotification event);
 }

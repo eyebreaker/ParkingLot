@@ -1,6 +1,6 @@
 package org.source;
 
-import org.Events.ParkingLotEvent;
+import org.Events.*;
 import org.Exceptions.CarNotExistException;
 import org.Exceptions.ParkingLotFullException;
 
@@ -13,56 +13,78 @@ import java.util.Map;
 public class ParkingAttendant implements ParkingLotObserver{
 
 
-    private Map<ParkingLot,Boolean> parkingLotMap = new HashMap<>();
+    private Map<ParkingLot,Integer> parkingLotMap = new HashMap<>();
+    private ParkingLotSelectStrategy parkingLotSelectStrategy = null;
 
-    public void addParkingLot(ParkingLot parkingLot){
-        parkingLotMap.put(parkingLot,true);
-    }
+    public void addParkingLot(ParkingLot parkingLot/*,ParkingLotSelectStrategy parkingLotSelectStrategy*/){
+        parkingLotMap.put(parkingLot,0);
+        //this.parkingLotSelectStrategy = parkingLotSelectStrategy;
+        setStrategy();
+        parkingLot.subscribeObserver(this, new SubscribeStrategy() {
+            @Override
+            public boolean apply(ParkingLotNotification event) {
+                if (event instanceof ParkingLotParkNotification) {
 
-    public String parkCar(Car car){
-        String attendantToken = null;
-        for(Map.Entry<ParkingLot,Boolean> entry:parkingLotMap.entrySet()){
-            if(entry.getValue()==true){
-                int token = entry.getKey().park(car);
-                attendantToken = entry.getKey().getName() + "-" + token;
-                return attendantToken;
+                        return true;
+
+                }
+                else if(event instanceof ParkingLotUnParkNotification){
+
+                        return true;
+                }
+                return false;
             }
 
-        }
+        });
+    }
 
+    private void setStrategy(){
+        parkingLotSelectStrategy = new ParkingLotSelectStrategy() {
+            @Override
+            public ParkingLot apply() {
+                ParkingLot parkingLot = null;
+                int maxCapacity = 0;
+                for (Map.Entry<ParkingLot, Integer> entry : parkingLotMap.entrySet()) {
+                    if(entry.getValue()>maxCapacity){
+                        parkingLot = entry.getKey();
+                        maxCapacity = entry.getValue();
+                    }
+                }
+
+                return parkingLot;
+            }
+        };
+    }
+
+    public Token parkCar(Car car){
+        Token attendantToken = null;
+        ParkingLot parkingLot = parkingLotSelectStrategy.apply();
+        if(parkingLot != null){
+            attendantToken = new Token(parkingLot,parkingLot.park(car));
+            return attendantToken;
+        }
         throw new ParkingLotFullException("There is no space in the parking Lots");
     }
 
-    public Car unParkCar(String attendantToken){
-        if(attendantToken.matches("[a-zA-Z]+-[0-9]+")){
-            String[] name_token = attendantToken.split("-");
-            String parkingLotName = name_token[0];
-            int token = Integer.parseInt(name_token[1]);
-            for (Map.Entry<ParkingLot, Boolean> entry : parkingLotMap.entrySet()) {
+    public Car unParkCar(Token attendantToken){
+            for (Map.Entry<ParkingLot, Integer> entry : parkingLotMap.entrySet()) {
 
-                if(entry.getKey().getName().equals(parkingLotName)){
-                    return entry.getKey().retriveCar(token);
+                if(entry.getKey().equals(attendantToken.getParkingLot())){
+                    return entry.getKey().retrieveCar(attendantToken.getToken());
                 }
 
             }
 
-            throw new CarNotExistException("There exists no such Car");
-        }
         throw new CarNotExistException("There exists no such Car");
     }
 
     @Override
-    public void notifyHandler(ParkingLotEvent event, String parkingLotName) {
-        if(event == ParkingLotEvent.FULL) {
-            for (Map.Entry<ParkingLot, Boolean> entry : parkingLotMap.entrySet()) {
-                if (entry.getKey().getName().equals(parkingLotName)) {
-                    entry.setValue(false);
-                }
-            }
-        }else if(event == ParkingLotEvent.ONAVAILABLE){
-            for (Map.Entry<ParkingLot, Boolean> entry : parkingLotMap.entrySet()) {
-                if (entry.getKey().getName().equals(parkingLotName)) {
-                    entry.setValue(true);
+    public void notifyHandler(ParkingLot parkingLot) {
+        ParkingLotNotification event = parkingLot.getEvent();
+        if(event instanceof ParkingLotState) {
+            for (Map.Entry<ParkingLot, Integer> entry : parkingLotMap.entrySet()) {
+                if (entry.getKey().equals(parkingLot)) {
+                    entry.setValue(((ParkingLotState) event).getSize()-((ParkingLotState) event).getCapacity());
                 }
             }
         }

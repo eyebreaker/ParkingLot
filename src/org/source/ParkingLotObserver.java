@@ -7,5 +7,5 @@ import org.Events.ParkingLotEvent;
  */
 public interface ParkingLotObserver {
 
-    public void notifyHandler(ParkingLotEvent event,String parkingLotName);
+    public void notifyHandler(ParkingLot parkingLot);
 }

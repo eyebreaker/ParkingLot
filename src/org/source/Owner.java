@@ -10,7 +10,7 @@ public class Owner implements ParkingLotOwner {
 
 
     @Override
-    public void notifyHandler(ParkingLotEvent event, String parkingLotName) {
+    public void notifyHandler(ParkingLot parkingLot) {
 
     }
 }

@@ -1,6 +1,7 @@
 package org.test;
 
 import org.Events.ParkingLotEvent;
+import org.source.ParkingLot;
 import org.source.ParkingLotObserver;
 
 /**
@@ -8,15 +9,15 @@ import org.source.ParkingLotObserver;
  */
 public class TestParkingLotObserver implements ParkingLotObserver{
 
-    private ParkingLotEvent status;
+    private boolean status = false;
 
-    public ParkingLotEvent getStatus(){
+    public boolean getStatus(){
         return status;
     }
 
 
     @Override
-    public void notifyHandler(ParkingLotEvent event, String parkingLotName) {
-
+    public void notifyHandler(ParkingLot parkingLot) {
+        status = true;
     }
 }
