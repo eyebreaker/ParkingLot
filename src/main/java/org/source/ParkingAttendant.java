@@ -16,10 +16,14 @@ public class ParkingAttendant implements ParkingLotObserver{
     private Map<ParkingLot,Integer> parkingLotMap = new HashMap<>();
     private ParkingLotSelectStrategy parkingLotSelectStrategy = null;
 
-    public void addParkingLot(ParkingLot parkingLot/*,ParkingLotSelectStrategy parkingLotSelectStrategy*/){
+    public ParkingAttendant(ParkingLotSelectStrategy parkingLotSelectStrategy){
+        this.parkingLotSelectStrategy = parkingLotSelectStrategy;
+
+    }
+
+    public void addParkingLot(ParkingLot parkingLot){
         parkingLotMap.put(parkingLot,0);
-        //this.parkingLotSelectStrategy = parkingLotSelectStrategy;
-        setStrategy();
+        //setStrategy();
         parkingLot.subscribeObserver(this, new SubscribeStrategy() {
             @Override
             public boolean apply(ParkingLotNotification event) {
@@ -38,7 +42,7 @@ public class ParkingAttendant implements ParkingLotObserver{
         });
     }
 
-    private void setStrategy(){
+    /*private void setStrategy(){
         parkingLotSelectStrategy = new ParkingLotSelectStrategy() {
             @Override
             public ParkingLot apply() {
@@ -54,11 +58,11 @@ public class ParkingAttendant implements ParkingLotObserver{
                 return parkingLot;
             }
         };
-    }
+    }*/
 
     public Token parkCar(Car car){
         Token attendantToken = null;
-        ParkingLot parkingLot = parkingLotSelectStrategy.apply();
+        ParkingLot parkingLot = parkingLotSelectStrategy.apply(parkingLotMap);
         if(parkingLot != null){
             attendantToken = new Token(parkingLot,parkingLot.park(car));
             return attendantToken;

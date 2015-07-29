@@ -18,6 +18,11 @@ public class ParkingLot {
     private int id;
     private int token = 0;
     private int currentNumCars = 0;
+
+    public int getParkingLotSize() {
+        return parkingLotSize;
+    }
+
     private int parkingLotSize = 2;
     private ParkingLotOwner owner;
     private Map<ParkingLotObserver,SubscribeStrategy> observers;
